@@ -74,22 +74,7 @@ dmesg | tail   # verify "Module unloaded"
  
 
  
-## 3. Demo Screenshots
-
-| # | What | Screenshot |
-|---|---|---|
-| 1 | Multi-container supervision | ![os_1](screenshot/1.png) |
-| 2 | Metadata tracking | ![os_2](screenshot/2.png) |
-| 3 | Bounded-buffer logging | ![os_3](screenshot/3.png) |
-| 4 | CLI and IPC | ![os_4](screenshot/4.png) |
-| 5 | Soft-limit warning | ![os_5_1](screenshot/5a.png) ![os_5_2](screenshot/5b.png) |
-| 6 | Hard-limit enforcement | ![os_6](screenshot/6.png) |
-| 7 | Scheduling experiment | ![os_7](screenshot/7.png) |
-| 8 | Clean teardown | ![os_8_1](screenshot/8.png) |
- 
-
- 
-## 4. Engineering Analysis
+## 3. Engineering Analysis
  
 ### Isolation Mechanisms
 The runtime uses `clone()` with `CLONE_NEWPID | CLONE_NEWUTS | CLONE_NEWNS`. Each container gets its own PID namespace (sees itself as PID 1), its own hostname, and its own mount namespace. `chroot()` locks the container into the Alpine rootfs. `/proc` is mounted inside the container after chroot so commands like `ps` work. The host kernel is still shared — all syscalls go through it and the container's PID is visible to the host.
@@ -110,7 +95,7 @@ Linux CFS assigns CPU time proportional to priority weights derived from `nice` 
  
 
  
-## 5. Design Decisions and Tradeoffs
+## 4. Design Decisions and Tradeoffs
  
 | Subsystem | Decision | Tradeoff | Justification |
 |---|---|---|---|
@@ -121,7 +106,7 @@ Linux CFS assigns CPU time proportional to priority weights derived from `nice` 
 | Scheduling experiments | `nice` values | Effect only visible under contention | Directly demonstrates CFS weight-based fairness |
  
  
-## 6. Scheduler Experiment Results
+## 5. Scheduler Experiment Results
  
 ### Experiment 1 — CPU-bound, different priorities
 Two `cpu_hog` containers running simultaneously:
@@ -136,3 +121,4 @@ The high-priority container finished faster. CFS weight ratio between nice -5 an
 ### Experiment 2 — CPU-bound vs I/O-bound
 `cpu_hog` and `io_pulse` at the same priority. The I/O-bound container blocked frequently on I/O, allowing the CPU-bound container to run during those periods. CFS boosted the I/O container's priority on wakeup, keeping its latency low despite sharing CPU.
 
+Demo screenshots are uploaded i the screenshots folder.
